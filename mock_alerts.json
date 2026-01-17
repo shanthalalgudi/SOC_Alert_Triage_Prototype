@@ -1,0 +1,50 @@
+[
+  {
+    "alert_id": "ALT001",
+    "source": "IDS",
+    "severity": "high",
+    "asset_type": "critical",
+    "frequency": 5,
+    "timestamp": "2026-01-17T10:30:00Z"
+  },
+  {
+    "alert_id": "ALT002",
+    "source": "EDR",
+    "severity": "medium",
+    "asset_type": "important",
+    "frequency": 2,
+    "timestamp": "2026-01-17T10:45:00Z"
+  },
+  {
+    "alert_id": "ALT003",
+    "source": "SIEM",
+    "severity": "low",
+    "asset_type": "standard",
+    "frequency": 1,
+    "timestamp": "2026-01-17T11:00:00Z"
+  },
+  {
+    "alert_id": "ALT004",
+    "source": "IDS",
+    "severity": "high",
+    "asset_type": "critical",
+    "frequency": 3,
+    "timestamp": "2026-01-17T11:15:00Z"
+  },
+  {
+    "alert_id": "ALT005",
+    "source": "EDR",
+    "severity": "medium",
+    "asset_type": "standard",
+    "frequency": 4,
+    "timestamp": "2026-01-17T11:30:00Z"
+  },
+  {
+    "alert_id": "ALT006",
+    "source": "SIEM",
+    "severity": "high",
+    "asset_type": "important",
+    "frequency": 2,
+    "timestamp": "2026-01-17T11:45:00Z"
+  }
+]
