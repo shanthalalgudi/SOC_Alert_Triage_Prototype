@@ -183,8 +183,8 @@
         }
 
         .severity-low {
-            background: #bbdefb;
-            color: black !important;
+            background: #42a5f5;
+            color: white !important;
         }
 
         /* Priority colors */
@@ -204,8 +204,8 @@
         }
 
         .priority-LOW {
-            background: #bbdefb;
-            color: black !important;
+            background: #42a5f5;
+            color: white !important;
         }
 
         .alerts-section {
@@ -256,54 +256,6 @@
             background: #1a2942;
         }
 
-        .severity-badge {
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-            min-width: 70px;
-        }
-
-        .severity-badge.high {
-            background: #ef5350;
-            color: white;
-        }
-
-        .severity-badge.medium {
-            background: #ff9800;
-            color: white;
-        }
-
-        .severity-badge.low {
-            background: #bbdefb;
-            color: black;
-        }
-
-        .asset-badge {
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-            min-width: 80px;
-        }
-
-        .asset-badge.critical {
-            background: #c62828;
-            color: white;
-        }
-
-        .asset-badge.important {
-            background: #fbc02d;
-            color: black;
-        }
-
-        .asset-badge.standard {
-            background: #757575;
-            color: white;
-        }
-
         .priority-badge {
             padding: 6px 12px;
             border-radius: 4px;
@@ -329,8 +281,8 @@
         }
 
         .priority-badge.priority-LOW {
-            background: #bbdefb;
-            color: black;
+            background: #42a5f5;
+            color: white;
         }
 
         .no-alerts {
@@ -568,8 +520,8 @@
                             <tr>
                                 <td>${alert.alert_id}</td>
                                 <td>${alert.source}</td>
-                                <td><span class="severity-badge ${alert.severity}">${alert.severity.toUpperCase()}</span></td>
-                                <td><span class="asset-badge ${alert.asset_type}">${alert.asset_type.toUpperCase()}</span></td>
+                                <td>${alert.severity}</td>
+                                <td>${alert.asset_type}</td>
                                 <td>${alert.frequency}</td>
                                 <td>${alert.risk_score}</td>
                                 <td><span class="priority-badge priority-${alert.priority}">${alert.priority}</span></td>
