@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Alert Triage Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background: #1a1a2e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .filter-group label {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-size: 1.1em;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #404040;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #757575;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #757575;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 8px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .custom-dropdown {
+            position: relative;
+        }
+
+        .dropdown-header {
+            padding: 10px;
+            background: #2a2a3e;
+            border: 2px solid #404040;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-header:hover {
+            border-color: #606060;
+        }
+
+        .dropdown-header.open {
+            border-color: #4a90e2;
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.3s;
+        }
+
+        .dropdown-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2a2a3e;
+            border: 2px solid #4a90e2;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.open {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-option {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dropdown-option:hover {
+            background: #3a3a4e;
+        }
+
+        .dropdown-option input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .dropdown-option label {
+            cursor: pointer;
+            flex: 1;
+            margin: 0;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Severity colors */
+        .severity-high {
+            background: #ef5350;
+            color: white !important;
+        }
+
+        .severity-medium {
+            background: #ff9800;
+            color: white !important;
+        }
+
+        .severity-low {
+            background: #42a5f5;
+            color: white !important;
+        }
+
+        /* Priority colors */
+        .priority-CRITICAL {
+            background: #c62828;
+            color: white !important;
+        }
+
+        .priority-HIGH {
+            background: #ef5350;
+            color: white !important;
+        }
+
+        .priority-MEDIUM {
+            background: #ff9800;
+            color: white !important;
+        }
+
+        .priority-LOW {
+            background: #42a5f5;
+            color: white !important;
+        }
+
+        .alerts-section {
+            background: #1a1a2e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .alert-count {
+            margin-bottom: 15px;
+            color: #b0b0b0;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #16213e;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: #0f3460;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #ffffff;
+            border-bottom: 2px solid #1a1a2e;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1a1a2e;
+        }
+
+        tbody tr:hover {
+            background: #1a2942;
+        }
+
+        .priority-badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .priority-badge.priority-CRITICAL {
+            background: #c62828;
+            color: white;
+        }
+
+        .priority-badge.priority-HIGH {
+            background: #ef5350;
+            color: white;
+        }
+
+        .priority-badge.priority-MEDIUM {
+            background: #ff9800;
+            color: white;
+        }
+
+        .priority-badge.priority-LOW {
+            background: #42a5f5;
+            color: white;
+        }
+
+        .no-alerts {
+            text-align: center;
+            padding: 40px;
+            color: #ff9800;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SOC Alert Triage Dashboard</h1>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label>Risk Score Threshold</label>
+                <div class="slider-container">
+                    <input type="range" id="threshold" min="0" max="100" value="0">
+                    <div class="slider-value" id="thresholdValue">0</div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Severity</label>
+                <div class="custom-dropdown">
+                    <div class="dropdown-header" id="severityHeader">
+                        <span id="severitySelected">All Selected</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="severityMenu">
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="sev-high" value="high" checked>
+                            <label for="sev-high" class="severity-high">High</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="sev-medium" value="medium" checked>
+                            <label for="sev-medium" class="severity-medium">Medium</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="sev-low" value="low" checked>
+                            <label for="sev-low" class="severity-low">Low</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Priority</label>
+                <div class="custom-dropdown">
+                    <div class="dropdown-header" id="priorityHeader">
+                        <span id="prioritySelected">All Selected</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="priorityMenu">
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="pri-critical" value="CRITICAL" checked>
+                            <label for="pri-critical" class="priority-CRITICAL">CRITICAL</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="pri-high" value="HIGH" checked>
+                            <label for="pri-high" class="priority-HIGH">HIGH</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="pri-medium" value="MEDIUM" checked>
+                            <label for="pri-medium" class="priority-MEDIUM">MEDIUM</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="pri-low" value="LOW" checked>
+                            <label for="pri-low" class="priority-LOW">LOW</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Source</label>
+                <div class="custom-dropdown">
+                    <div class="dropdown-header" id="sourceHeader">
+                        <span id="sourceSelected">All Selected</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="sourceMenu">
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="src-ids" value="IDS" checked>
+                            <label for="src-ids">IDS</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="src-edr" value="EDR" checked>
+                            <label for="src-edr">EDR</label>
+                        </div>
+                        <div class="dropdown-option">
+                            <input type="checkbox" id="src-siem" value="SIEM" checked>
+                            <label for="src-siem">SIEM</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alerts-section">
+            <h2>Alerts</h2>
+            <div class="alert-count" id="alertCount"></div>
+            <div id="alertsTable"></div>
+        </div>
+    </div>
+
+    <script>
+        const mockAlerts = [
+            { alert_id: "ALT001", source: "IDS", severity: "high", asset_type: "critical", frequency: 5, timestamp: "2026-01-17T10:30:00Z" },
+            { alert_id: "ALT002", source: "EDR", severity: "medium", asset_type: "important", frequency: 2, timestamp: "2026-01-17T10:45:00Z" },
+            { alert_id: "ALT003", source: "SIEM", severity: "low", asset_type: "standard", frequency: 1, timestamp: "2026-01-17T11:00:00Z" },
+            { alert_id: "ALT004", source: "IDS", severity: "high", asset_type: "critical", frequency: 3, timestamp: "2026-01-17T11:15:00Z" },
+            { alert_id: "ALT005", source: "EDR", severity: "medium", asset_type: "standard", frequency: 4, timestamp: "2026-01-17T11:30:00Z" },
+            { alert_id: "ALT006", source: "SIEM", severity: "high", asset_type: "important", frequency: 2, timestamp: "2026-01-17T11:45:00Z" }
+        ];
+
+        const severityMap = { low: 1, medium: 2, high: 3 };
+        const assetMap = { standard: 1, important: 2, critical: 3 };
+
+        function calculateRiskScore(alert) {
+            const severityScore = severityMap[alert.severity];
+            const assetScore = assetMap[alert.asset_type];
+            return severityScore * 20 + assetScore * 15 + alert.frequency * 2;
+        }
+
+        function assignPriority(score) {
+            if (score >= 80) return "CRITICAL";
+            if (score >= 60) return "HIGH";
+            if (score >= 40) return "MEDIUM";
+            return "LOW";
+        }
+
+        // Dropdown functionality
+        function setupDropdown(headerId, menuId, selectedId, checkboxSelector) {
+            const header = document.getElementById(headerId);
+            const menu = document.getElementById(menuId);
+            const arrow = header.querySelector('.dropdown-arrow');
+            const selectedSpan = document.getElementById(selectedId);
+
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('open');
+                arrow.classList.toggle('open');
+                header.classList.toggle('open');
+            });
+
+            const checkboxes = document.querySelectorAll(`${checkboxSelector} input[type="checkbox"]`);
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    updateSelectedText(checkboxSelector, selectedSpan);
+                    filterAndDisplayAlerts();
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!header.contains(e.target) && !menu.contains(e.target)) {
+                    menu.classList.remove('open');
+                    arrow.classList.remove('open');
+                    header.classList.remove('open');
+                }
+            });
+        }
+
+        function updateSelectedText(checkboxSelector, selectedSpan) {
+            const checkboxes = document.querySelectorAll(`${checkboxSelector} input[type="checkbox"]:checked`);
+            const count = checkboxes.length;
+            const total = document.querySelectorAll(`${checkboxSelector} input[type="checkbox"]`).length;
+            
+            if (count === 0) {
+                selectedSpan.textContent = 'None Selected';
+            } else if (count === total) {
+                selectedSpan.textContent = 'All Selected';
+            } else {
+                selectedSpan.textContent = `${count} Selected`;
+            }
+        }
+
+        function getCheckedValues(checkboxSelector) {
+            const checkboxes = document.querySelectorAll(`${checkboxSelector} input[type="checkbox"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function filterAndDisplayAlerts() {
+            const threshold = parseInt(document.getElementById('threshold').value);
+            const selectedSeverities = getCheckedValues('#severityMenu');
+            const selectedPriorities = getCheckedValues('#priorityMenu');
+            const selectedSources = getCheckedValues('#sourceMenu');
+
+            let filteredAlerts = mockAlerts
+                .filter(alert => selectedSeverities.includes(alert.severity))
+                .filter(alert => selectedSources.includes(alert.source))
+                .map(alert => ({
+                    ...alert,
+                    risk_score: calculateRiskScore(alert)
+                }))
+                .map(alert => ({
+                    ...alert,
+                    priority: assignPriority(alert.risk_score)
+                }))
+                .filter(alert => alert.risk_score >= threshold)
+                .filter(alert => selectedPriorities.includes(alert.priority))
+                .sort((a, b) => b.risk_score - a.risk_score);
+
+            displayAlerts(filteredAlerts);
+        }
+
+        function displayAlerts(alerts) {
+            const container = document.getElementById('alertsTable');
+            const countEl = document.getElementById('alertCount');
+
+            countEl.textContent = `Total Alerts: ${alerts.length}`;
+
+            if (alerts.length === 0) {
+                container.innerHTML = '<div class="no-alerts">No alerts match the selected filters.</div>';
+                return;
+            }
+
+            const table = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Alert ID</th>
+                            <th>Source</th>
+                            <th>Severity</th>
+                            <th>Asset Type</th>
+                            <th>Frequency</th>
+                            <th>Risk Score</th>
+                            <th>Priority</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${alerts.map(alert => `
+                            <tr>
+                                <td>${alert.alert_id}</td>
+                                <td>${alert.source}</td>
+                                <td>${alert.severity}</td>
+                                <td>${alert.asset_type}</td>
+                                <td>${alert.frequency}</td>
+                                <td>${alert.risk_score}</td>
+                                <td><span class="priority-badge priority-${alert.priority}">${alert.priority}</span></td>
+                                <td>${new Date(alert.timestamp).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = table;
+        }
+
+        // Initialize dropdowns
+        setupDropdown('severityHeader', 'severityMenu', 'severitySelected', '#severityMenu');
+        setupDropdown('priorityHeader', 'priorityMenu', 'prioritySelected', '#priorityMenu');
+        setupDropdown('sourceHeader', 'sourceMenu', 'sourceSelected', '#sourceMenu');
+
+        // Threshold slider
+        document.getElementById('threshold').addEventListener('input', (e) => {
+            document.getElementById('thresholdValue').textContent = e.target.value;
+            filterAndDisplayAlerts();
+        });
+
+        // Initial display
+        filterAndDisplayAlerts();
+    </script>
+</body>
+</html>
